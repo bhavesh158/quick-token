@@ -48,8 +48,21 @@ class TokenQueue < ApplicationRecord
       customer_count: customers.count,
       waiting_count: waiting.count,
       queue_status: status,
-      completed_at: completed_at
+      completed_at: completed_at,
+      avg_wait_time_minutes: calculate_avg_wait_time,
+      total_served_today: served_count
     }
+  end
+
+  def calculate_avg_wait_time
+    served = customers.served.where("updated_at > ?", Time.current.beginning_of_day)
+    return nil if served.empty?
+
+    total_wait = served.sum do |customer|
+      ((customer.updated_at - customer.created_at) / 60).to_i
+    end
+
+    (total_wait / served.count).to_i
   end
 
   private

@@ -56,28 +56,66 @@ class CustomersController < ApplicationController
       return
     end
 
-    completed_queue = false
+    if @token_queue.serving_customer.nil? && @token_queue.waiting_customers.none?
+      redirect_to admin_token_queue_path(@token_queue.unique_token), alert: "No customers available to serve."
+      return
+    end
 
     ActiveRecord::Base.transaction do
       current_customer = @token_queue.serving_customer
       current_customer&.update!(status: "served")
 
       next_customer = @token_queue.waiting_customers.first
-      if next_customer
-        next_customer.update!(status: "serving")
-      else
-        @token_queue.update!(status: "completed", completed_at: Time.current)
-        completed_queue = true
-      end
+      next_customer&.update!(status: "serving")
     end
 
     broadcast_queue_update
 
-    if completed_queue
-      redirect_to admin_token_queues_path(status: "completed"), notice: "Queue completed."
-    else
-      redirect_to admin_token_queue_path(@token_queue.unique_token), notice: "Queue advanced."
+    redirect_to admin_token_queue_path(@token_queue.unique_token), notice: "Queue advanced."
+  end
+
+  def skip
+    if @token_queue.completed?
+      redirect_to admin_token_queue_path(@token_queue.unique_token), alert: "Queue is completed."
+      return
     end
+
+    customer_to_skip = @token_queue.waiting_customers.find_by(id: params[:customer_id])
+
+    unless customer_to_skip
+      redirect_to admin_token_queue_path(@token_queue.unique_token), alert: "Customer not found in waiting queue."
+      return
+    end
+
+    customer_to_skip.update!(status: "served")
+    broadcast_queue_update
+
+    redirect_to admin_token_queue_path(@token_queue.unique_token), notice: "Customer skipped."
+  end
+
+  def remove
+    if @token_queue.completed?
+      redirect_to admin_token_queue_path(@token_queue.unique_token), alert: "Queue is completed."
+      return
+    end
+
+    customer_to_remove = @token_queue.customers.find_by(id: params[:id])
+
+    unless customer_to_remove
+      redirect_to admin_token_queue_path(@token_queue.unique_token), alert: "Customer not found."
+      return
+    end
+
+    if customer_to_remove.status == "served"
+      redirect_to admin_token_queue_path(@token_queue.unique_token), alert: "Served entries cannot be removed."
+      return
+    end
+
+    queue_memberships.delete(@token_queue.unique_token) if queue_memberships[@token_queue.unique_token].to_s == customer_to_remove.id.to_s
+    customer_to_remove.destroy
+    broadcast_queue_update
+
+    redirect_to admin_token_queue_path(@token_queue.unique_token), notice: "Customer removed from queue."
   end
 
   private

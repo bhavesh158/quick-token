@@ -2,35 +2,41 @@
   <%= render "shared/admin_sidebar", active_item: :queues %>
 
   <div class="flex-1">
-    <header class="border-b border-slate-200 bg-white px-6 py-4 lg:px-10">
-      <h1 class="text-2xl font-bold tracking-tight text-slate-900">Queue Dashboard</h1>
-      <p class="text-xs uppercase tracking-wider text-slate-500">Manage active and completed queue sessions</p>
+    <header class="border-b border-slate-200 bg-white px-4 py-3 lg:px-8 lg:py-4">
+      <h1 class="text-xl font-bold tracking-tight text-slate-900 lg:text-2xl">Queue Dashboard</h1>
+      <p class="text-xs uppercase tracking-wider text-slate-500 hidden sm:block">Manage active and completed queue sessions</p>
     </header>
 
-    <main class="mx-auto w-full max-w-6xl px-4 py-8 lg:px-8">
+    <main class="w-full px-4 py-6 lg:px-8">
       <% if flash[:notice].present? %>
-        <div class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800"><%= flash[:notice] %></div>
+        <div class="flash-message mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800"><%= flash[:notice] %></div>
       <% end %>
       <% if flash[:alert].present? %>
-        <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"><%= flash[:alert] %></div>
+        <div class="flash-message mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"><%= flash[:alert] %></div>
       <% end %>
 
-      <section class="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 class="mb-3 text-lg font-semibold text-slate-900">Create New Queue</h2>
+      <section class="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm lg:p-6">
+        <h2 class="mb-4 text-lg font-semibold text-slate-900">Create New Queue</h2>
         <%= form_with(model: @new_token_queue, url: create_token_queues_path, class: "flex flex-col gap-3 sm:flex-row") do |form| %>
           <%= hidden_field_tag :from_dashboard, "1" %>
-          <%= form.text_field :name, required: true, placeholder: "Queue name (e.g. Downtown Clinic)", class: "flex-1 rounded-lg border border-slate-300 px-3 py-2" %>
-          <%= form.submit "Create Queue", class: "rounded-lg bg-primary px-4 py-2 font-semibold text-white hover:bg-primary/90" %>
+          <%= form.text_field :name, required: true, placeholder: "Queue name (e.g. Downtown Clinic, Main Salon)", class: "flex-1 rounded-lg border border-slate-300 px-4 py-2.5 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" %>
+          <%= form.submit "Create Queue", class: "rounded-lg bg-primary px-6 py-2.5 font-semibold text-white shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors" %>
         <% end %>
       </section>
 
-      <section class="mb-6 flex items-center gap-3">
-        <a href="<%= admin_token_queues_path(status: 'active') %>" class="rounded-lg px-3 py-2 text-sm font-semibold <%= @status_filter == 'active' ? 'bg-primary text-white' : 'bg-white border border-slate-300 text-slate-700' %>">Active (<%= @active_count %>)</a>
-        <a href="<%= admin_token_queues_path(status: 'completed') %>" class="rounded-lg px-3 py-2 text-sm font-semibold <%= @status_filter == 'completed' ? 'bg-primary text-white' : 'bg-white border border-slate-300 text-slate-700' %>">Completed (<%= @completed_count %>)</a>
+      <section class="mb-4 flex flex-wrap items-center gap-2">
+        <a href="<%= admin_token_queues_path(status: 'active') %>" class="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors <%= @status_filter == 'active' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50' %>">
+          <span class="material-symbols-outlined text-sm">circle</span>
+          Active (<%= @active_count %>)
+        </a>
+        <a href="<%= admin_token_queues_path(status: 'completed') %>" class="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors <%= @status_filter == 'completed' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50' %>">
+          <span class="material-symbols-outlined text-sm">check_circle</span>
+          Completed (<%= @completed_count %>)
+        </a>
       </section>
 
       <section class="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-        <div class="border-b border-slate-200 px-5 py-3">
+        <div class="border-b border-slate-200 px-4 py-3 lg:px-6">
           <h2 class="text-lg font-semibold text-slate-900"><%= @status_filter.capitalize %> Queues</h2>
         </div>
 
@@ -40,28 +46,82 @@
               <% waiting_count = queue.customers.count { |c| c.status == "waiting" } %>
               <% serving_customer = queue.customers.find { |c| c.status == "serving" } %>
               <% served_count = queue.customers.count { |c| c.status == "served" } %>
-              <div class="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p class="font-semibold text-slate-900"><%= queue.name %></p>
-                  <p class="text-xs text-slate-500">Created <%= queue.created_at.strftime("%b %d, %Y %I:%M %p") %></p>
-                  <% if queue.completed? %>
-                    <p class="text-xs text-slate-500">Completed <%= queue.completed_at&.strftime("%b %d, %Y %I:%M %p") %></p>
-                  <% end %>
-                  <p class="text-xs text-slate-500">Public Link: <%= token_queue_url(queue.unique_token) %></p>
+              <div class="group flex flex-col gap-4 px-4 py-4 transition-colors hover:bg-slate-50 lg:flex-row lg:items-center lg:justify-between lg:px-6">
+                <div class="flex-1">
+                  <div class="flex items-center gap-3">
+                    <p class="font-semibold text-slate-900 text-base lg:text-lg"><%= queue.name %></p>
+                    <span class="inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide <%= queue.completed? ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700' %>">
+                      <%= queue.status %>
+                    </span>
+                  </div>
+                  <div class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+                    <span>Created <%= queue.created_at.strftime("%b %d, %Y %I:%M %p") %></span>
+                    <% if queue.completed? %>
+                      <span>•</span>
+                      <span>Completed <%= queue.completed_at&.strftime("%b %d, %Y %I:%M %p") %></span>
+                    <% end %>
+                  </div>
+                  <div class="mt-2 flex flex-wrap gap-2">
+                    <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                      <span class="material-symbols-outlined text-xs">group</span>
+                      <%= waiting_count %> waiting
+                    </span>
+                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                      <span class="material-symbols-outlined text-xs">check_circle</span>
+                      <%= served_count %> served
+                    </span>
+                    <% if serving_customer %>
+                      <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+                        <span class="material-symbols-outlined text-xs">person</span>
+                        Serving #<%= serving_customer.id %>
+                      </span>
+                    <% end %>
+                  </div>
                 </div>
-                <div class="flex items-center gap-2">
-                  <span class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"><%= waiting_count %> waiting</span>
-                  <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700"><%= served_count %> served</span>
-                  <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600"><%= serving_customer ? "Serving ##{serving_customer.id}" : "Not serving" %></span>
-                  <a href="<%= admin_token_queue_path(queue.unique_token) %>" class="rounded-lg bg-slate-900 px-3 py-2 text-xs font-bold text-white hover:bg-slate-700">Manage</a>
+                <div class="flex flex-wrap items-center gap-2">
+                  <% if queue.active? %>
+                    <a href="<%= admin_token_queue_path(queue.unique_token) %>" class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-slate-700 transition-colors">
+                      <span class="material-symbols-outlined text-sm">dashboard</span>
+                      Manage
+                    </a>
+                  <% else %>
+                    <a href="<%= admin_token_queue_path(queue.unique_token) %>" class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-slate-700 transition-colors">
+                      <span class="material-symbols-outlined text-sm">visibility</span>
+                      View
+                    </a>
+                    <a href="<%= admin_token_queue_report_path(queue.unique_token) %>" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors">
+                      <span class="material-symbols-outlined text-sm">download</span>
+                      Export
+                    </a>
+                    <%= form_with(url: delete_admin_token_queue_path(queue.unique_token), method: :delete) do |form| %>
+                      <%= form.submit "Delete", data: { turbo_confirm: "Delete this completed queue? This action cannot be undone." }, class: "inline-flex items-center gap-1.5 rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-xs font-bold text-red-700 hover:bg-red-100 transition-colors" %>
+                    <% end %>
+                  <% end %>
                 </div>
               </div>
             <% end %>
           </div>
         <% else %>
-          <div class="px-5 py-10 text-center text-sm text-slate-500">No queues yet. Create your first queue above.</div>
+          <div class="flex flex-col items-center justify-center px-4 py-16 text-center">
+            <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
+              <span class="material-symbols-outlined text-3xl text-slate-400">queue</span>
+            </div>
+            <p class="text-sm font-medium text-slate-700">No <%= @status_filter %> queues yet</p>
+            <p class="mt-1 text-xs text-slate-500">Create your first queue to get started</p>
+          </div>
         <% end %>
       </section>
     </main>
   </div>
 </div>
+
+<script>
+  // Auto-hide flash messages
+  setTimeout(() => {
+    document.querySelectorAll(".flash-message").forEach(el => {
+      el.style.transition = "opacity 0.3s"
+      el.style.opacity = "0"
+      setTimeout(() => el.remove(), 300)
+    })
+  }, 4000)
+</script>

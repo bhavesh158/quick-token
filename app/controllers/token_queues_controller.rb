@@ -1,9 +1,9 @@
 require "csv"
 
 class TokenQueuesController < ApplicationController
-  before_action :require_admin!, only: %i[index admin report]
+  before_action :require_admin!, only: %i[index admin report complete destroy]
   before_action :set_token_queue_by_token, only: %i[show]
-  before_action :set_token_queue_by_admin_token, only: %i[admin report]
+  before_action :set_token_queue_by_admin_token, only: %i[admin report complete destroy]
 
   def new
     if admin_logged_in?
@@ -84,6 +84,35 @@ class TokenQueuesController < ApplicationController
     send_data csv,
               filename: "#{@token_queue.name.parameterize}-queue-report.csv",
               type: "text/csv"
+  end
+
+  def complete
+    if @token_queue.completed?
+      redirect_to admin_token_queue_path(@token_queue.unique_token), alert: "Queue is already completed."
+      return
+    end
+
+    now = Time.current
+    ActiveRecord::Base.transaction do
+      @token_queue.customers.where.not(status: "served").update_all(status: "served", updated_at: now)
+      @token_queue.update!(status: "completed", completed_at: now)
+    end
+
+    ActionCable.server.broadcast(
+      "queue_#{@token_queue.unique_token}",
+      {
+        action: "queue_updated",
+        queue_status: @token_queue.queue_status
+      }
+    )
+
+    redirect_to admin_token_queues_path(status: "completed"), notice: "Queue completed."
+  end
+
+  def destroy
+    queue_name = @token_queue.name
+    @token_queue.destroy!
+    redirect_to admin_token_queues_path(status: "completed"), notice: "#{queue_name} deleted."
   end
 
   private
