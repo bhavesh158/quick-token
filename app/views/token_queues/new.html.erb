@@ -7,13 +7,7 @@
         </div>
         <h2 class="text-xl font-bold tracking-tight text-slate-900">QuickToken</h2>
       </div>
-      <nav class="hidden md:flex items-center gap-8">
-        <a class="text-sm font-medium text-slate-600 hover:text-primary" href="#how-it-works">How it works</a>
-        <a class="text-sm font-medium text-slate-600 hover:text-primary" href="#features">Features</a>
-        <a class="text-sm font-medium text-slate-600 hover:text-primary" href="#start">Start</a>
-      </nav>
       <div class="flex items-center gap-4">
-        <a href="<%= admin_login_path %>" class="hidden sm:flex h-10 items-center justify-center rounded-lg border border-slate-300 px-4 text-sm font-bold text-slate-700 transition-all hover:bg-slate-100">Admin Login</a>
         <button class="hidden sm:flex h-10 items-center justify-center rounded-lg bg-primary px-5 text-sm font-bold text-white transition-all hover:bg-primary/90" form="new-queue-form">Create Queue</button>
       </div>
     </div>
@@ -146,7 +140,7 @@
         <div class="relative z-10 flex flex-col items-center gap-6">
           <h2 class="max-w-2xl text-3xl font-black sm:text-4xl md:text-5xl">Ready to clear the crowd?</h2>
           <p class="max-w-lg text-lg opacity-90">Start your first digital queue today.</p>
-          <button class="mt-4 flex h-14 items-center justify-center rounded-xl bg-white px-10 text-lg font-bold text-primary transition-all hover:bg-slate-50">Get Started Now</button>
+          <a href="#start" class="mt-4 flex h-14 items-center justify-center rounded-xl bg-white px-10 text-lg font-bold text-primary transition-all hover:bg-slate-50">Get Started Now</a>
         </div>
       </div>
     </section>
@@ -160,12 +154,6 @@
             <span class="material-symbols-outlined text-sm">confirmation_number</span>
           </div>
           <span class="text-lg font-bold tracking-tight text-slate-900">QuickToken</span>
-        </div>
-        <div class="flex flex-wrap items-center justify-center gap-8 text-sm font-medium text-slate-500">
-          <a class="hover:text-primary" href="<%= privacy_path %>">Privacy Policy</a>
-          <a class="hover:text-primary" href="<%= terms_path %>">Terms of Service</a>
-          <a class="hover:text-primary" href="<%= help_path %>">Help Center</a>
-          <a class="hover:text-primary" href="<%= contact_path %>">Contact</a>
         </div>
         <div class="text-sm text-slate-400">© 2026 QuickToken. All rights reserved.</div>
       </div>
