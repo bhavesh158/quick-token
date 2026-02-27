@@ -3,6 +3,11 @@ class CustomersController < ApplicationController
   before_action :require_admin!, only: %i[next]
 
   def create
+    if @token_queue.completed?
+      redirect_to token_queue_path(@token_queue.unique_token), alert: "This queue is completed and no longer accepting joins."
+      return
+    end
+
     token = @token_queue.unique_token
     existing_customer_id = queue_memberships[token]
     existing_customer = @token_queue.customers.find_by(id: existing_customer_id) if existing_customer_id.present?
@@ -46,17 +51,33 @@ class CustomersController < ApplicationController
   end
 
   def next
+    if @token_queue.completed?
+      redirect_to admin_token_queue_path(@token_queue.unique_token), alert: "Queue is completed."
+      return
+    end
+
+    completed_queue = false
+
     ActiveRecord::Base.transaction do
       current_customer = @token_queue.serving_customer
       current_customer&.update!(status: "served")
 
       next_customer = @token_queue.waiting_customers.first
-      next_customer&.update!(status: "serving")
+      if next_customer
+        next_customer.update!(status: "serving")
+      else
+        @token_queue.update!(status: "completed", completed_at: Time.current)
+        completed_queue = true
+      end
     end
 
     broadcast_queue_update
 
-    redirect_to admin_token_queue_path(@token_queue.unique_token), notice: "Queue advanced."
+    if completed_queue
+      redirect_to admin_token_queues_path(status: "completed"), notice: "Queue completed."
+    else
+      redirect_to admin_token_queue_path(@token_queue.unique_token), notice: "Queue advanced."
+    end
   end
 
   private

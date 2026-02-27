@@ -3,10 +3,24 @@ require "securerandom"
 class TokenQueue < ApplicationRecord
   has_many :customers, dependent: :destroy
 
+  STATUSES = %w[active completed].freeze
+
   validates :name, presence: true
   validates :unique_token, presence: true, uniqueness: true
+  validates :status, inclusion: { in: STATUSES }
 
   before_validation :generate_unique_token, on: :create
+
+  scope :active, -> { where(status: "active") }
+  scope :completed, -> { where(status: "completed") }
+
+  def active?
+    status == "active"
+  end
+
+  def completed?
+    status == "completed"
+  end
 
   def waiting_customers
     customers.waiting.order(:created_at, :id)
@@ -20,6 +34,10 @@ class TokenQueue < ApplicationRecord
     customers.served.order(updated_at: :desc).limit(limit_count)
   end
 
+  def served_count
+    customers.served.count
+  end
+
   def queue_status
     waiting = waiting_customers
 
@@ -28,7 +46,9 @@ class TokenQueue < ApplicationRecord
       waiting_customers: waiting.map { |customer| serialize_customer(customer) },
       served_customers: served_customers.map { |customer| serialize_customer(customer) },
       customer_count: customers.count,
-      waiting_count: waiting.count
+      waiting_count: waiting.count,
+      queue_status: status,
+      completed_at: completed_at
     }
   end
 

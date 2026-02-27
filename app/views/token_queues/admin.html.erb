@@ -1,53 +1,43 @@
 <div
-  class="relative flex min-h-screen w-full flex-col bg-background-light text-slate-900"
+  class="min-h-screen bg-background-light text-slate-900 lg:flex"
   data-queue-view="admin"
   data-queue-token="<%= @token_queue.unique_token %>"
   data-queue-status="<%= json_escape(@queue_status.to_json) %>"
 >
-  <header class="sticky top-0 z-50 flex items-center justify-between border-b border-slate-200 bg-white/80 backdrop-blur-md px-6 py-4 lg:px-12">
-    <div class="flex items-center gap-4">
-      <%= link_to quicktoken_brand_path, class: "flex items-center gap-2" do %>
-        <div class="flex items-center justify-center rounded-lg bg-primary p-2 text-white">
-          <span class="material-symbols-outlined">confirmation_number</span>
+  <%= render "shared/admin_sidebar", active_item: :queues %>
+
+  <div class="flex-1">
+    <header class="border-b border-slate-200 bg-white px-6 py-4 lg:px-10">
+      <div class="flex items-center justify-between gap-3">
+        <div>
+          <h2 class="text-2xl font-bold tracking-tight text-slate-900"><%= @token_queue.name %></h2>
+          <p class="text-xs uppercase tracking-wider text-slate-500">Queue Admin</p>
+          <span class="mt-1 inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide <%= @token_queue.completed? ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700' %>">
+            <%= @token_queue.status %>
+          </span>
         </div>
-        <h2 class="text-xl font-bold leading-tight tracking-tight">QuickToken</h2>
-      <% end %>
-      <div class="h-6 w-px bg-slate-200"></div>
-      <div>
-        <h2 class="text-xl font-bold leading-tight tracking-tight"><%= @token_queue.name %></h2>
-        <p class="text-xs font-medium uppercase tracking-wider text-slate-500">Queue Admin</p>
+        <div class="flex items-center gap-2">
+          <a href="<%= admin_token_queues_path %>" class="rounded-lg bg-slate-900 px-3 py-2 text-xs font-bold text-white hover:bg-slate-700">Back to Queues</a>
+          <a href="<%= admin_token_queue_report_path(@token_queue.unique_token) %>" class="rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700">Report</a>
+        </div>
       </div>
-    </div>
-    <div class="flex items-center gap-3">
-      <div class="hidden md:flex items-center rounded-lg border border-slate-200 bg-slate-100 px-3 py-1.5 gap-2 mr-4">
+    </header>
+
+    <main class="mx-auto w-full max-w-6xl px-4 py-8 lg:px-8">
+      <% if flash[:notice].present? %>
+        <div class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800"><%= flash[:notice] %></div>
+      <% end %>
+      <% if flash[:alert].present? %>
+        <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"><%= flash[:alert] %></div>
+      <% end %>
+
+      <div class="mb-6 hidden md:flex items-center rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 gap-2">
         <span class="material-symbols-outlined text-sm text-primary">link</span>
         <span id="public-queue-link" class="text-xs font-medium text-slate-600"><%= @public_queue_url %></span>
-        <button
-          type="button"
-          class="text-xs font-bold text-primary hover:text-primary/80"
-          onclick="copyQueueLink()"
-        >
-          Copy
-        </button>
+        <button type="button" class="text-xs font-bold text-primary hover:text-primary/80" onclick="copyQueueLink()">Copy</button>
       </div>
-      <a href="<%= admin_token_queue_report_path(@token_queue.unique_token) %>" class="rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700">Report</a>
-      <a href="<%= admin_token_queues_path %>" class="rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700">All Queues</a>
-      <%= form_with(url: admin_logout_path, method: :delete) do |form| %>
-        <%= form.submit "Logout", class: "rounded-lg bg-slate-900 px-3 py-2 text-xs font-bold text-white hover:bg-slate-700" %>
-      <% end %>
-    </div>
-  </header>
 
-  <main class="mx-auto w-full max-w-7xl flex-1 px-4 py-8 lg:px-12">
-    <% if flash[:notice].present? %>
-      <div class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800"><%= flash[:notice] %></div>
-    <% end %>
-    <% if flash[:alert].present? %>
-      <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"><%= flash[:alert] %></div>
-    <% end %>
-
-    <div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
-      <div class="flex flex-col gap-8 lg:col-span-7">
+      <div class="grid grid-cols-1 gap-8 xl:grid-cols-2">
         <div class="relative overflow-hidden rounded-xl border border-slate-200 bg-white p-8 shadow-xl">
           <div class="absolute top-0 right-0 p-6 opacity-10"><span class="material-symbols-outlined text-[120px]">person_play</span></div>
           <div class="relative z-10">
@@ -60,57 +50,46 @@
                 <h1 class="mb-2 text-4xl font-bold tracking-tight text-slate-900" id="now-serving-name">N/A</h1>
               </div>
             </div>
-            <div class="mt-10 flex gap-4">
-              <%= form_with(url: next_customer_path(token_queue_token: @token_queue.unique_token), method: :post, html: { class: "flex-1" }) do |form| %>
-                <%= form.submit "Complete Session", class: "w-full rounded-xl bg-primary py-4 font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90" %>
+            <div class="mt-10">
+              <% if @token_queue.active? %>
+                <%= form_with(url: next_customer_path(token_queue_token: @token_queue.unique_token), method: :post) do |form| %>
+                  <%= form.submit "Complete Session", class: "w-full rounded-xl bg-primary py-4 font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90" %>
+                <% end %>
+              <% else %>
+                <button class="w-full rounded-xl bg-slate-300 py-4 font-bold text-slate-700" disabled>Queue Completed</button>
               <% end %>
             </div>
           </div>
         </div>
 
-        <div class="flex flex-col gap-4">
-          <%= form_with(url: next_customer_path(token_queue_token: @token_queue.unique_token), method: :post) do |form| %>
-            <%= form.button class: "w-full rounded-2xl bg-primary py-8 text-white shadow-2xl shadow-primary/40 transition-all hover:scale-[1.01] active:scale-[0.99]" do %>
-              <div class="flex flex-col items-center justify-center gap-2">
-                <div class="flex items-center gap-3">
-                  <span class="material-symbols-outlined text-4xl">person_add</span>
-                  <span class="text-3xl font-black uppercase italic tracking-tight">Call Next Customer</span>
-                </div>
-                <span class="font-medium" id="waiting-count-cta"><%= @queue_status[:waiting_count] %> People waiting in queue</span>
-              </div>
-            <% end %>
-          <% end %>
-
-        </div>
-      </div>
-
-      <div class="flex flex-col gap-8 lg:col-span-5">
-        <div class="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-          <div class="flex items-center justify-between border-b border-slate-200 bg-slate-50/50 px-6 py-4">
-            <h3 class="flex items-center gap-2 font-bold text-slate-800"><span class="material-symbols-outlined text-primary">group</span>Waiting Queue</h3>
-            <span class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary" id="waiting-count-header"><%= @queue_status[:waiting_count] %> Customers</span>
+        <div class="flex flex-col gap-8">
+          <div class="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div class="flex items-center justify-between border-b border-slate-200 bg-slate-50/50 px-6 py-4">
+              <h3 class="flex items-center gap-2 font-bold text-slate-800"><span class="material-symbols-outlined text-primary">group</span>Waiting Queue</h3>
+              <span class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary" id="waiting-count-header"><%= @queue_status[:waiting_count] %> Customers</span>
+            </div>
+            <div class="max-h-[400px] divide-y divide-slate-100 overflow-y-auto" id="waiting-list-container"></div>
           </div>
-          <div class="max-h-[400px] divide-y divide-slate-100 overflow-y-auto" id="waiting-list-container"></div>
-        </div>
 
-        <div class="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-          <div class="flex items-center justify-between border-b border-slate-200 bg-slate-50/50 px-6 py-4">
-            <h3 class="flex items-center gap-2 font-bold text-slate-800"><span class="material-symbols-outlined text-emerald-500">history</span>Recently Served</h3>
+          <div class="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div class="flex items-center justify-between border-b border-slate-200 bg-slate-50/50 px-6 py-4">
+              <h3 class="flex items-center gap-2 font-bold text-slate-800"><span class="material-symbols-outlined text-emerald-500">history</span>Recently Served</h3>
+            </div>
+            <div class="divide-y divide-slate-100" id="served-list-container"></div>
           </div>
-          <div class="divide-y divide-slate-100" id="served-list-container"></div>
         </div>
       </div>
-    </div>
-  </main>
 
-  <footer class="mt-auto flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 bg-white px-6 py-4 lg:px-12">
-    <div class="flex items-center gap-8">
-      <div class="flex flex-col">
-        <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Today's Volume</span>
-        <span class="text-sm font-bold text-slate-700" id="today-volume"><%= @queue_status[:customer_count] %> customers</span>
-      </div>
-    </div>
-  </footer>
+      <footer class="mt-8 rounded-xl border border-slate-200 bg-white px-6 py-4">
+        <div class="flex items-center gap-8">
+          <div class="flex flex-col">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Today's Volume</span>
+            <span class="text-sm font-bold text-slate-700" id="today-volume"><%= @queue_status[:customer_count] %> customers</span>
+          </div>
+        </div>
+      </footer>
+    </main>
+  </div>
 </div>
 
 <script>

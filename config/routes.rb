@@ -10,12 +10,14 @@ Rails.application.routes.draw do
   get "queues/:id", to: "token_queues#show", as: :token_queue
 
   get "admin/queues", to: "token_queues#index", as: :admin_token_queues
-  get "admin/:token", to: "token_queues#admin", as: :admin_token_queue
-  get "admin/:token/report", to: "token_queues#report", as: :admin_token_queue_report
+  get "queue/:id", to: "token_queues#admin", as: :admin_token_queue
+  get "queue/:id/report", to: "token_queues#report", as: :admin_token_queue_report
+  get "admin/:id", to: redirect("/queue/%{id}")
+  get "admin/:id/report", to: redirect("/queue/%{id}/report")
 
   post "queues/:token_queue_token/customers", to: "customers#create", as: :join_queue
   delete "queues/:token_queue_token/customers/:id", to: "customers#destroy", as: :leave_queue
-  post "admin/:token_queue_token/next", to: "customers#next", as: :next_customer
+  post "queue/:token_queue_token/next", to: "customers#next", as: :next_customer
 
   get "privacy", to: "static_pages#privacy", as: :privacy
   get "terms", to: "static_pages#terms", as: :terms

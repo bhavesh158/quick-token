@@ -15,7 +15,11 @@ class TokenQueuesController < ApplicationController
   end
 
   def index
-    @token_queues = TokenQueue.order(created_at: :desc).includes(:customers)
+    @status_filter = params[:status] == "completed" ? "completed" : "active"
+    base_scope = @status_filter == "completed" ? TokenQueue.completed : TokenQueue.active
+    @token_queues = base_scope.order(created_at: :desc).includes(:customers)
+    @active_count = TokenQueue.active.count
+    @completed_count = TokenQueue.completed.count
     @new_token_queue = TokenQueue.new
   end
 
@@ -92,7 +96,8 @@ class TokenQueuesController < ApplicationController
   end
 
   def set_token_queue_by_admin_token
-    @token_queue = TokenQueue.find_by(unique_token: params[:token])
+    lookup_token = params[:id] || params[:token]
+    @token_queue = TokenQueue.find_by(unique_token: lookup_token)
     return if @token_queue
 
     redirect_to root_path, alert: "Invalid queue token."
