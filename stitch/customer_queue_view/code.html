@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2b6cee",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<title>QuickToken - Customer Queue</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Navigation Bar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 px-6 py-4 lg:px-40 bg-white dark:bg-background-dark/50 sticky top-0 z-50 backdrop-blur-md">
+<div class="flex items-center gap-4">
+<div class="size-8 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight">QuickToken</h2>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-[20px]">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex flex-1 justify-center py-8 px-4 lg:px-40">
+<div class="layout-content-container flex flex-col max-w-[480px] w-full gap-6">
+<!-- Header Status -->
+<div class="flex flex-col items-center text-center space-y-2">
+<div class="flex items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+</span>
+                            Live Updates
+                        </div>
+<h1 class="text-2xl font-bold text-slate-900 dark:text-white pt-2">Priority Support Queue</h1>
+<p class="text-slate-500 dark:text-slate-400">Main Office • Downtown Branch</p>
+</div>
+<!-- Hero Position Card -->
+<div class="bg-primary rounded-xl p-8 text-white shadow-xl shadow-primary/20 flex flex-col items-center text-center relative overflow-hidden">
+<!-- Abstract Background Decoration -->
+<div class="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+<div class="absolute bottom-0 left-0 -ml-8 -mb-8 w-24 h-24 bg-black/10 rounded-full blur-xl"></div>
+<span class="text-primary-100 text-sm font-medium mb-1 relative z-10 opacity-90 uppercase tracking-widest">Your Position</span>
+<div class="text-7xl font-extrabold mb-4 relative z-10">4</div>
+<div class="w-full h-1 bg-white/20 rounded-full mb-6 relative z-10">
+<div class="w-1/4 h-full bg-white rounded-full"></div>
+</div>
+<div class="flex items-center gap-2 text-sm font-medium bg-white/10 px-4 py-2 rounded-lg relative z-10 backdrop-blur-sm">
+<span class="material-symbols-outlined text-sm">timer</span>
+                            Est. wait: 12 mins
+                        </div>
+</div>
+<!-- Status Secondary Cards -->
+<div class="grid grid-cols-1 gap-4">
+<div class="flex items-center justify-between p-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm">
+<div class="flex flex-col">
+<span class="text-slate-500 dark:text-slate-400 text-sm font-medium">Currently Serving</span>
+<span class="text-2xl font-bold text-slate-900 dark:text-white">Ticket #1</span>
+</div>
+<div class="size-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl">groups</span>
+</div>
+</div>
+</div>
+<!-- Progress List -->
+<div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+<div class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
+<h3 class="font-bold text-slate-800 dark:text-slate-200">Queue Activity</h3>
+<span class="text-xs text-primary font-semibold">3 people ahead of you</span>
+</div>
+<div class="divide-y divide-slate-100 dark:divide-slate-700">
+<div class="p-4 flex items-center gap-4 opacity-100">
+<div class="size-10 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm">2</div>
+<div class="flex-1">
+<div class="text-sm font-semibold text-slate-900 dark:text-white">Next up</div>
+<div class="text-xs text-slate-500 dark:text-slate-400">Estimated call: 4m</div>
+</div>
+<div class="text-xs font-medium text-slate-400 italic">Waiting</div>
+</div>
+<div class="p-4 flex items-center gap-4">
+<div class="size-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center font-bold text-sm">3</div>
+<div class="flex-1">
+<div class="text-sm font-medium text-slate-700 dark:text-slate-300">Ticket #3</div>
+<div class="text-xs text-slate-500 dark:text-slate-400">Estimated call: 8m</div>
+</div>
+<div class="text-xs font-medium text-slate-400 italic">Waiting</div>
+</div>
+<div class="p-4 flex items-center gap-4 bg-primary/5 border-l-4 border-primary">
+<div class="size-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">4</div>
+<div class="flex-1">
+<div class="text-sm font-bold text-primary">You (Your Ticket)</div>
+<div class="text-xs text-primary/70">Estimated call: 12m</div>
+</div>
+<div class="text-xs font-bold text-primary uppercase">Current</div>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col gap-3 mt-4">
+<button class="flex w-full items-center justify-center rounded-xl h-14 bg-primary text-white font-bold text-lg shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all">
+                            Refresh Status
+                        </button>
+<button class="flex w-full items-center justify-center rounded-xl h-12 bg-transparent border-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all">
+                            Leave Queue
+                        </button>
+</div>
+<!-- Tips / Footer -->
+<div class="mt-4 p-4 rounded-lg bg-slate-100 dark:bg-slate-800/50 flex gap-3 items-start">
+<span class="material-symbols-outlined text-primary">info</span>
+<p class="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
+                            Keep this page open to receive real-time updates. We'll send a notification when you're next in line.
+                        </p>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation (Mobile View Optimized) -->
+<nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-slate-800 px-6 py-3 flex justify-around items-center z-50">
+<button class="flex flex-col items-center text-primary">
+<span class="material-symbols-outlined">confirmation_number</span>
+<span class="text-[10px] font-bold mt-1 uppercase">Ticket</span>
+</button>
+<button class="flex flex-col items-center text-slate-400 dark:text-slate-500">
+<span class="material-symbols-outlined">map</span>
+<span class="text-[10px] font-bold mt-1 uppercase">Branch</span>
+</button>
+<button class="flex flex-col items-center text-slate-400 dark:text-slate-500">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-bold mt-1 uppercase">Settings</span>
+</button>
+</nav>
+</div>
+</div>
+</body></html>
