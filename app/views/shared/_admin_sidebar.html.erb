@@ -14,9 +14,9 @@
   <nav class="flex-1 px-4 py-5">
     <p class="mb-3 px-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Navigation</p>
     <div class="space-y-2">
-      <a href="<%= admin_token_queues_path %>" class="block rounded-lg px-3 py-2.5 text-sm font-semibold <%= active_item == :queues ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' %>">
-        <span class="material-symbols-outlined text-sm mr-2">queue</span>
-        Queues
+      <a href="<%= admin_token_queues_path %>" class="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold <%= active_item == :queues ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' %>">
+        <span class="material-symbols-outlined text-base">queue</span>
+        <span>Queues</span>
       </a>
     </div>
   </nav>

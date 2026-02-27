@@ -30,7 +30,7 @@ class AdminSessionsController < ApplicationController
     session.delete(:admin_logged_in)
     session.delete(:return_to)
     session.delete(:pending_queue_name)
-    redirect_to admin_login_path, notice: "Logged out."
+    redirect_to root_path, notice: "Logged out successfully."
   end
 
   private

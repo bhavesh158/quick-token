@@ -8,13 +8,6 @@
     </header>
 
     <main class="w-full px-4 py-6 lg:px-8">
-      <% if flash[:notice].present? %>
-        <div class="flash-message mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800"><%= flash[:notice] %></div>
-      <% end %>
-      <% if flash[:alert].present? %>
-        <div class="flash-message mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"><%= flash[:alert] %></div>
-      <% end %>
-
       <section class="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm lg:p-6">
         <h2 class="mb-4 text-lg font-semibold text-slate-900">Create New Queue</h2>
         <%= form_with(model: @new_token_queue, url: create_token_queues_path, class: "flex flex-col gap-3 sm:flex-row") do |form| %>
@@ -114,14 +107,3 @@
     </main>
   </div>
 </div>
-
-<script>
-  // Auto-hide flash messages
-  setTimeout(() => {
-    document.querySelectorAll(".flash-message").forEach(el => {
-      el.style.transition = "opacity 0.3s"
-      el.style.opacity = "0"
-      setTimeout(() => el.remove(), 300)
-    })
-  }, 4000)
-</script>

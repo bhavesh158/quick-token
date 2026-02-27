@@ -26,13 +26,6 @@
     </header>
 
     <main class="w-full px-4 py-6 lg:px-8">
-      <% if flash[:notice].present? %>
-        <div id="flash-notice" class="flash-message mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800"><%= flash[:notice] %></div>
-      <% end %>
-      <% if flash[:alert].present? %>
-        <div id="flash-alert" class="flash-message mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"><%= flash[:alert] %></div>
-      <% end %>
-
       <nav aria-label="Breadcrumb" class="mb-4">
         <ol class="flex items-center gap-2 text-xs font-semibold text-slate-500">
           <li><a href="<%= admin_token_queues_path %>" class="hover:text-slate-700">Queues</a></li>
@@ -217,9 +210,6 @@
     </main>
   </div>
 
-  <!-- Toast Notification Container -->
-  <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
-
   <!-- Skip/Remove Confirmation Modal -->
   <div id="action-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm">
     <div class="mx-4 w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
@@ -260,7 +250,7 @@
       info: "info"
     }
     
-    toast.className = `flex items-center gap-3 rounded-lg border px-4 py-3 text-sm font-medium shadow-lg ${colors[type]} animate-slide-in`
+    toast.className = `toast-notification flex items-center gap-3 rounded-lg border px-4 py-3 text-sm font-medium shadow-lg animate-slide-in ${colors[type]}`
     toast.innerHTML = `
       <span class="material-symbols-outlined text-lg">${icons[type]}</span>
       <span>${message}</span>
@@ -269,10 +259,11 @@
     container.appendChild(toast)
     
     setTimeout(() => {
+      toast.style.transition = "opacity 0.3s, transform 0.3s"
       toast.style.opacity = "0"
       toast.style.transform = "translateX(100%)"
       setTimeout(() => toast.remove(), 300)
-    }, 3000)
+    }, 6000)
   }
 
   function openModal(title, message, onConfirm) {
@@ -318,15 +309,6 @@
       }
     )
   }
-
-  // Auto-hide flash messages
-  setTimeout(() => {
-    document.querySelectorAll(".flash-message").forEach(el => {
-      el.style.transition = "opacity 0.3s"
-      el.style.opacity = "0"
-      setTimeout(() => el.remove(), 300)
-    })
-  }, 4000)
 </script>
 
 <style>

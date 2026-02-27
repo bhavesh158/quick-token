@@ -25,13 +25,6 @@
 
     <main class="flex flex-1 justify-center py-8 px-4 lg:px-40">
       <div class="layout-content-container flex w-full max-w-[520px] flex-col gap-6 pb-20">
-        <% if flash[:notice].present? %>
-          <div class="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800"><%= flash[:notice] %></div>
-        <% end %>
-        <% if flash[:alert].present? %>
-          <div class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"><%= flash[:alert] %></div>
-        <% end %>
-
         <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <h2 class="text-lg font-semibold text-slate-800 mb-4">Join the Queue</h2>
           <% if @token_queue.completed? %>
