@@ -1,3 +1,5 @@
+require "csv"
+
 class TokenQueuesController < ApplicationController
   before_action :require_admin!, only: %i[admin report]
   before_action :set_token_queue_by_token, only: %i[show]
@@ -8,6 +10,12 @@ class TokenQueuesController < ApplicationController
   end
 
   def create
+    unless admin_logged_in?
+      session[:pending_queue_name] = params.dig(:token_queue, :name).to_s
+      redirect_to admin_login_path, alert: "Admin login required to create a queue."
+      return
+    end
+
     @token_queue = TokenQueue.new(token_queue_params)
 
     if @token_queue.save

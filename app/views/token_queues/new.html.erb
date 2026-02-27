@@ -8,6 +8,14 @@
         <h2 class="text-xl font-bold tracking-tight text-slate-900">QuickToken</h2>
       </div>
       <div class="flex items-center gap-4">
+        <% if admin_logged_in? %>
+          <span class="hidden sm:inline rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">Admin session active</span>
+          <%= form_with(url: admin_logout_path, method: :delete) do |form| %>
+            <%= form.submit "Logout", class: "hidden sm:flex h-10 items-center justify-center rounded-lg bg-slate-900 px-4 text-sm font-bold text-white transition-all hover:bg-slate-700" %>
+          <% end %>
+        <% else %>
+          <a href="<%= admin_login_path %>" class="hidden sm:flex h-10 items-center justify-center rounded-lg border border-slate-300 px-4 text-sm font-bold text-slate-700 transition-all hover:bg-slate-100">Admin Login</a>
+        <% end %>
         <button class="hidden sm:flex h-10 items-center justify-center rounded-lg bg-primary px-5 text-sm font-bold text-white transition-all hover:bg-primary/90" form="new-queue-form">Create Queue</button>
       </div>
     </div>
