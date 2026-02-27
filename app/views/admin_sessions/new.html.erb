@@ -1,13 +1,13 @@
 <div class="relative flex min-h-screen flex-col font-display bg-background-light text-slate-900 antialiased">
   <header class="sticky top-0 z-50 w-full border-b border-slate-200 bg-background-light/80 backdrop-blur-md">
     <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
-      <div class="flex items-center gap-2">
+      <%= link_to quicktoken_brand_path, class: "flex items-center gap-2" do %>
         <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white">
           <span class="material-symbols-outlined text-xl">confirmation_number</span>
         </div>
         <h2 class="text-xl font-bold tracking-tight text-slate-900">QuickToken</h2>
-      </div>
-      <a href="<%= root_path %>" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">Back to Home</a>
+      <% end %>
+      <a href="<%= quicktoken_brand_path %>" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">Home</a>
     </div>
   </header>
 
