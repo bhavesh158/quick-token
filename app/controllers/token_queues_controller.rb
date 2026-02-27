@@ -57,6 +57,9 @@ class TokenQueuesController < ApplicationController
 
     if @current_customer&.status.in?(%w[waiting serving])
       queue_memberships[@token_queue.unique_token] = @current_customer.id
+    elsif @current_customer&.status == "served"
+      # Customer was served, keep them in session for reference but don't update membership
+      queue_memberships[@token_queue.unique_token] = @current_customer.id
     else
       queue_memberships.delete(@token_queue.unique_token)
       @current_customer = nil

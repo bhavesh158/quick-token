@@ -170,48 +170,131 @@ function renderAdmin(queueStatus) {
 
 function renderCustomer(queueStatus, currentCustomerId) {
   const waitingCustomers = queueStatus.waiting_customers || []
-  const currentCustomer = waitingCustomers.find((customer) => String(customer.id) === String(currentCustomerId))
-  const position = currentCustomer ? waitingCustomers.findIndex((customer) => customer.id === currentCustomer.id) + 1 : null
+  const servedCustomers = queueStatus.served_customers || []
+  const nowServingCustomer = queueStatus.now_serving
+  const currentCustomer = waitingCustomers.find((customer) => String(customer.id) === String(currentCustomerId)) || 
+                          (nowServingCustomer && String(nowServingCustomer.id) === String(currentCustomerId) ? nowServingCustomer : null)
+  const position = currentCustomer && currentCustomer.status === 'waiting' 
+    ? waitingCustomers.findIndex((customer) => customer.id === currentCustomer.id) + 1 
+    : (nowServingCustomer && String(nowServingCustomer.id) === String(currentCustomerId) ? 0 : null)
+  const totalWaiting = queueStatus.waiting_count || waitingCustomers.length
 
+  // Update position display
   const customerPosition = document.getElementById("customer-position")
+  const customerTicketId = document.getElementById("customer-ticket-id")
+  const positionProgressBar = document.getElementById("position-progress-bar")
   const peopleAhead = document.getElementById("people-ahead")
+  const queueCount = document.getElementById("queue-count")
+  const totalWaitingCount = document.getElementById("total-waiting-count")
   const nowServing = document.getElementById("now-serving")
-  const totalWaiting = document.getElementById("total-waiting")
+  const nowServingName = document.getElementById("now-serving-name")
+  const nowServingTicket = document.getElementById("now-serving-ticket")
+  const nowServingTime = document.getElementById("now-serving-time")
   const estimatedWait = document.getElementById("estimated-wait")
 
-  if (customerPosition) customerPosition.textContent = position || "-"
-  if (peopleAhead) peopleAhead.textContent = position ? `${position - 1} people ahead` : "Join to get your place"
-  if (totalWaiting) totalWaiting.textContent = `${queueStatus.waiting_count} waiting`
-  if (estimatedWait) estimatedWait.textContent = position ? `${position * 5} mins` : "N/A"
-  if (nowServing) {
-    nowServing.textContent = queueStatus.now_serving
-      ? `${queueStatus.now_serving.name} (Ticket #${queueStatus.now_serving.id})`
-      : "No one yet"
+  // Update ticket ID if customer exists
+  if (customerTicketId && currentCustomerId) {
+    customerTicketId.textContent = currentCustomerId
   }
 
+  if (customerPosition) {
+    if (position === 0) {
+      customerPosition.textContent = "NOW"
+    } else {
+      customerPosition.textContent = position || "-"
+    }
+  }
+  
+  if (positionProgressBar) {
+    const maxPosition = Math.max(totalWaiting, 1)
+    const progress = position && position > 0 ? ((maxPosition - position + 1) / maxPosition) * 100 : (position === 0 ? 100 : 0)
+    positionProgressBar.style.width = `${Math.max(progress, 10)}%`
+  }
+  
+  if (peopleAhead) {
+    if (position === 0) {
+      peopleAhead.textContent = "You're being served!"
+    } else {
+      peopleAhead.textContent = position ? `${position - 1} people ahead` : "Join to get your place"
+    }
+  }
+  
+  if (queueCount) queueCount.textContent = `${totalWaiting} ${totalWaiting === 1 ? 'person' : 'people'}`
+  if (totalWaitingCount) totalWaitingCount.textContent = totalWaiting
+  if (estimatedWait) {
+    if (position === 0) {
+      estimatedWait.textContent = "Being served now"
+    } else {
+      estimatedWait.textContent = position ? `~${position * 5} min wait` : "N/A"
+    }
+  }
+  
+  if (nowServing) {
+    nowServing.textContent = nowServingCustomer
+      ? `${nowServingCustomer.name}`
+      : "No one yet"
+  }
+  if (nowServingName) {
+    nowServingName.textContent = nowServingCustomer
+      ? `${nowServingCustomer.name}`
+      : "-"
+  }
+  if (nowServingTicket) {
+    nowServingTicket.textContent = nowServingCustomer ? nowServingCustomer.id : "--"
+  }
+  if (nowServingTime) {
+    nowServingTime.textContent = nowServingCustomer
+      ? `Called at ${formatTime(nowServingCustomer.updated_at)}`
+      : ""
+  }
+
+  // Update queue list
   const queueList = document.getElementById("queue-list")
   if (queueList) {
-    queueList.innerHTML = waitingCustomers.length
+    const oldHtml = queueList.innerHTML
+    const newHtml = waitingCustomers.length
       ? waitingCustomers
-          .slice(0, 6)
+          .slice(0, 10)
           .map((customer, index) => {
             const isCurrent = String(customer.id) === String(currentCustomerId)
+            const bgColor = getColorForName(customer.name)
             return `
-              <div class="p-4 flex items-center gap-4 ${isCurrent ? "bg-primary/5 border-l-4 border-primary" : ""}">
-                <div class="size-10 rounded-full ${isCurrent ? "bg-primary text-white" : "bg-primary/20 text-primary"} flex items-center justify-center font-bold text-sm">${index + 1}</div>
-                <div class="flex-1">
-                  <div class="text-sm font-semibold ${isCurrent ? "text-primary" : "text-slate-900 dark:text-white"}">${isCurrent ? "You" : customer.name}</div>
-                  <div class="text-xs text-slate-500 dark:text-slate-400">Estimated call: ${(index + 1) * 5}m</div>
+              <div class="flex items-center gap-4 p-4 ${isCurrent ? "bg-primary/5" : "hover:bg-slate-50"} transition-colors">
+                <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${isCurrent ? "bg-primary text-white" : "bg-primary/10 text-primary"} font-bold text-sm">
+                  ${index + 1}
                 </div>
-                <div class="text-xs font-medium text-slate-400 italic">${isCurrent ? "Current" : "Waiting"}</div>
+                <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${bgColor} text-white font-bold text-xs">
+                  ${getInitials(customer.name)}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2">
+                    <span class="text-sm font-semibold ${isCurrent ? "text-primary" : "text-slate-900"}">
+                      ${isCurrent ? "You" : customer.name}
+                    </span>
+                    ${isCurrent ? '<span class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase text-primary">Your spot</span>' : ''}
+                  </div>
+                  <div class="text-xs text-slate-500">Joined ${formatTimeAgo(customer.created_at)}</div>
+                </div>
+                <div class="text-xs font-medium text-slate-400">
+                  ${isCurrent ? 'Current' : `~${(index + 1) * 5}m`}
+                </div>
               </div>`
           })
           .join("")
-      : '<div class="p-4 text-center text-slate-500">No one is currently waiting.</div>'
+      : '<div class="p-6 text-center text-slate-500"><span class="material-symbols-outlined text-3xl text-slate-300 mb-2">queue</span><br>No one is currently waiting.</div>'
+    
+    if (oldHtml !== newHtml) {
+      queueList.innerHTML = newHtml
+    }
   }
 
+  // Update leave button state
   const leaveButton = document.getElementById("leave-queue-button")
-  if (leaveButton) leaveButton.disabled = !currentCustomerId
+  if (leaveButton) {
+    leaveButton.disabled = !currentCustomerId
+    leaveButton.style.opacity = currentCustomerId ? '1' : '0.5'
+    leaveButton.style.cursor = currentCustomerId ? 'pointer' : 'not-allowed'
+  }
 }
 
 function queueViewInit() {
@@ -231,7 +314,9 @@ function queueViewInit() {
       renderAdmin(initialStatus)
       setupKeyboardShortcuts()
     }
-    if (queueView === "customer") renderCustomer(initialStatus, currentCustomerId)
+    if (queueView === "customer") {
+      renderCustomer(initialStatus, currentCustomerId)
+    }
   }
 
   queueSubscription?.unsubscribe()

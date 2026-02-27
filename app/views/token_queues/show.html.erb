@@ -1,99 +1,231 @@
 <div
-  class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden bg-background-light font-display text-slate-900"
+  class="relative flex min-h-screen w-full flex-col bg-gray-50 font-display text-slate-900"
   data-queue-view="customer"
   data-queue-token="<%= @token_queue.unique_token %>"
   data-customer-id="<%= @current_customer&.id %>"
   data-queue-status="<%= json_escape(@queue_status.to_json) %>"
 >
-  <div class="layout-container flex h-full grow flex-col">
-    <header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 bg-white px-6 py-4 lg:px-40 backdrop-blur-md">
-      <div class="flex items-center gap-4">
-        <div class="size-8 text-primary">
-          <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path></svg>
-        </div>
-        <h2 class="text-lg font-bold leading-tight tracking-tight text-slate-900"><%= @token_queue.name %></h2>
+  <!-- Header -->
+  <header class="sticky top-0 z-50 flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
+    <div class="flex items-center gap-2">
+      <div class="flex h-8 w-8 items-center justify-center rounded bg-primary text-white">
+        <span class="material-symbols-outlined text-lg">confirmation_number</span>
       </div>
-      <div class="flex gap-3">
-        <button class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-700">
-          <span class="material-symbols-outlined text-[20px]">notifications</span>
-        </button>
-        <button class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-700">
-          <span class="material-symbols-outlined text-[20px]">account_circle</span>
-        </button>
+      <div class="min-w-0">
+        <h2 class="text-sm font-bold text-slate-900 truncate"><%= @token_queue.name %></h2>
+        <p class="text-[10px] font-medium text-slate-500">
+          <%= @token_queue.completed? ? 'Queue Closed' : 'Accepting customers' %>
+        </p>
       </div>
-    </header>
+    </div>
+    <div class="flex items-center gap-1 rounded bg-emerald-100 px-2 py-0.5">
+      <span class="relative flex h-1.5 w-1.5">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+      </span>
+      <span class="text-[10px] font-bold text-emerald-700">LIVE</span>
+    </div>
+  </header>
 
-    <main class="flex flex-1 justify-center py-8 px-4 lg:px-40">
-      <div class="layout-content-container flex w-full max-w-[520px] flex-col gap-6 pb-20">
-        <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 class="text-lg font-semibold text-slate-800 mb-4">Join the Queue</h2>
-          <% if @token_queue.completed? %>
-            <div class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm font-medium text-amber-700">
-              This queue is completed. New joins are closed.
+  <main class="flex-1 px-4 py-6">
+    <div class="mx-auto max-w-lg space-y-4">
+      
+      <!-- Queue Closed Banner -->
+      <% if @token_queue.completed? %>
+        <div class="rounded-lg border border-amber-300 bg-amber-50 p-4 text-center">
+          <span class="material-symbols-outlined text-amber-600 text-3xl">event_busy</span>
+          <h3 class="mt-2 text-sm font-bold text-amber-800">Queue Closed</h3>
+          <p class="text-xs text-amber-700">This queue is no longer accepting new customers.</p>
+        </div>
+      <% end %>
+
+      <!-- Join Queue Card -->
+      <% if !@token_queue.completed? %>
+        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+          <div class="mb-4 flex items-center gap-2">
+            <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded bg-primary/10 text-primary">
+              <span class="material-symbols-outlined text-lg">person_add</span>
+            </div>
+            <div class="min-w-0">
+              <h2 class="text-base font-bold text-slate-900">Join the Queue</h2>
+              <p class="text-xs text-slate-500">Enter your name to get in line</p>
+            </div>
+          </div>
+          
+          <%= form_with(model: @join_customer, url: join_queue_path(token_queue_token: @token_queue.unique_token), html: { class: "space-y-3" }) do |form| %>
+            <div>
+              <%= form.label :name, "Your Name", class: "mb-1 block text-xs font-semibold text-slate-700" %>
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-base">badge</span>
+                <%= form.text_field :name, required: true, placeholder: "Enter your name", class: "w-full rounded-lg border border-gray-300 bg-white pl-10 pr-3 py-2.5 text-sm placeholder-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" %>
+              </div>
+            </div>
+            <%= form.submit "Join Queue", class: "w-full rounded-lg bg-primary py-2.5 text-sm font-bold text-white hover:bg-primary/90" %>
+          <% end %>
+          
+          <% if @current_customer %>
+            <div class="mt-3 pt-3 border-t border-gray-100">
+              <%= form_with(url: leave_queue_path(token_queue_token: @token_queue.unique_token, id: @current_customer.id), method: :delete) do |form| %>
+                <%= form.submit "Leave Queue", class: "w-full rounded-lg border-2 border-gray-200 bg-white py-2.5 text-sm font-bold text-gray-600 hover:bg-red-50 hover:text-red-600 hover:border-red-300" %>
+              <% end %>
             </div>
           <% else %>
-            <%= form_with(model: @join_customer, url: join_queue_path(token_queue_token: @token_queue.unique_token), html: { class: "flex flex-col gap-4" }) do |form| %>
-              <div>
-                <%= form.label :name, "Your Name", class: "mb-1 block text-sm font-medium text-slate-700" %>
-                <%= form.text_field :name, required: true, placeholder: "Enter your name", class: "w-full rounded-lg border border-slate-300 px-3 py-2" %>
-              </div>
-              <%= form.submit "Join Queue", class: "w-full rounded-lg bg-primary px-4 py-2 font-bold text-white shadow-lg shadow-primary/30" %>
-            <% end %>
-            <% if @current_customer %>
-              <div class="mt-3">
-                <%= form_with(url: leave_queue_path(token_queue_token: @token_queue.unique_token, id: @current_customer.id), method: :delete) do |form| %>
-                  <%= form.submit "Leave Queue", id: "leave-queue-button", class: "w-full rounded-lg border-2 border-slate-200 px-4 py-2 font-bold text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200" %>
-                <% end %>
-              </div>
-            <% else %>
-              <button id="leave-queue-button" class="mt-3 flex w-full items-center justify-center rounded-lg h-12 bg-transparent border-2 border-slate-200 text-slate-600 font-bold" disabled>Leave Queue</button>
-            <% end %>
+            <button class="mt-3 w-full rounded-lg border-2 border-gray-200 bg-white py-2.5 text-sm font-bold text-gray-400 cursor-not-allowed" disabled>Leave Queue</button>
           <% end %>
         </div>
+      <% end %>
 
-        <div class="flex flex-col items-center space-y-2 text-center">
-          <div class="flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-700">
-            <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span>
-            Live Updates
+      <!-- Customer Dashboard -->
+      <% if @current_customer %>
+        <!-- Position Card -->
+        <div class="rounded-xl bg-primary p-5 text-center text-white shadow-lg">
+          <div class="mb-2 text-[10px] font-semibold uppercase tracking-wider opacity-90">Your Ticket</div>
+          <div class="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20">
+            <span class="text-3xl font-black" id="customer-ticket-id"><%= @current_customer.id %></span>
           </div>
-        </div>
-
-        <div class="relative overflow-hidden rounded-xl bg-primary p-8 text-center text-white shadow-xl shadow-primary/20">
-          <div class="absolute top-0 right-0 -mr-8 -mt-8 h-32 w-32 rounded-full bg-white/10 blur-2xl"></div>
-          <div class="absolute bottom-0 left-0 -ml-8 -mb-8 h-24 w-24 rounded-full bg-black/10 blur-xl"></div>
-          <span class="relative z-10 mb-1 text-sm font-medium uppercase tracking-widest opacity-90">Your Position</span>
-          <div class="relative z-10 mb-4 text-7xl font-extrabold" id="customer-position">-</div>
-          <div class="relative z-10 mb-6 h-1 w-full rounded-full bg-white/20"><div class="h-full w-1/4 rounded-full bg-white"></div></div>
-          <div class="relative z-10 inline-flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur-sm">
+          
+          <div class="mb-2 text-[10px] font-semibold uppercase tracking-wider opacity-90">Your Position</div>
+          <div class="mb-4 text-6xl font-black" id="customer-position">-</div>
+          
+          <div class="mb-4 h-1.5 w-full rounded-full bg-white/30">
+            <div class="h-full rounded-full bg-white" id="position-progress-bar" style="width: 0%"></div>
+          </div>
+          
+          <div class="inline-flex items-center gap-1.5 rounded bg-white/20 px-3 py-1.5 text-xs font-semibold backdrop-blur">
             <span class="material-symbols-outlined text-sm">timer</span>
-            <span id="estimated-wait">N/A</span>
+            <span id="estimated-wait">-</span>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-4">
-          <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div class="flex flex-col">
-              <span class="text-sm font-medium text-slate-500">Currently Serving</span>
-              <span class="text-2xl font-bold text-slate-900" id="now-serving">No one yet</span>
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="rounded-lg border border-gray-200 bg-white p-3">
+            <div class="mb-1 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-primary text-base">group</span>
+              <span class="text-[10px] font-semibold uppercase text-slate-500">Waiting</span>
             </div>
-            <div class="size-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-3xl">support_agent</span></div>
+            <p class="text-xl font-bold text-slate-900" id="total-waiting-count">-</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 bg-white p-3">
+            <div class="mb-1 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-emerald-600 text-base">person</span>
+              <span class="text-[10px] font-semibold uppercase text-slate-500">Serving</span>
+            </div>
+            <p class="text-sm font-bold text-slate-900 truncate" id="now-serving-name">-</p>
           </div>
         </div>
 
-        <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
-          <div class="flex items-center justify-between border-b border-slate-100 p-4">
-            <h3 class="font-bold text-slate-800">Queue Activity</h3>
-            <span class="text-xs font-semibold text-primary" id="people-ahead">Join to get your place</span>
-          </div>
-          <div id="queue-list" class="divide-y divide-slate-100"></div>
+        <!-- Leave Button -->
+        <div class="rounded-lg border border-gray-200 bg-white p-3">
+          <p class="mb-2 text-xs font-semibold text-slate-700">No longer waiting?</p>
+          <%= form_with(url: leave_queue_path(token_queue_token: @token_queue.unique_token, id: @current_customer.id), method: :delete) do |form| %>
+            <%= form.submit "Leave Queue", class: "w-full rounded border border-red-300 bg-red-50 py-2 text-xs font-bold text-red-700 hover:bg-red-100" %>
+          <% end %>
         </div>
+      <% end %>
 
-        <div class="mt-1 rounded-lg bg-slate-100 p-4 flex gap-3 items-start">
-          <span class="material-symbols-outlined text-primary">info</span>
-          <p class="text-xs leading-relaxed text-slate-600">Keep this page open to receive real-time updates.</p>
-          <span id="total-waiting" class="hidden"></span>
+      <!-- Now Serving -->
+      <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div class="border-b border-gray-100 bg-emerald-50 px-4 py-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-emerald-600 text-lg">support_agent</span>
+              <h3 class="text-sm font-bold text-slate-800">Now Serving</h3>
+            </div>
+            <span class="animate-pulse rounded bg-emerald-500 px-2 py-0.5 text-[10px] font-bold uppercase text-white">Live</span>
+          </div>
+        </div>
+        <div class="p-4">
+          <div class="flex items-center gap-3">
+            <div class="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <span class="material-symbols-outlined text-2xl">person</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs text-slate-500">Current Customer</p>
+              <p class="text-base font-bold text-slate-900 truncate" id="now-serving">No one yet</p>
+              <p class="text-[10px] text-slate-400" id="now-serving-time"></p>
+            </div>
+            <div class="flex-shrink-0 rounded-lg bg-emerald-100 px-3 py-1.5 text-center">
+              <span class="text-[10px] font-semibold uppercase text-emerald-700">#</span>
+              <p class="text-lg font-black text-emerald-700" id="now-serving-ticket">--</p>
+            </div>
+          </div>
         </div>
       </div>
-    </main>
-  </div>
+
+      <!-- Queue List -->
+      <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div class="border-b border-gray-100 bg-gray-50 px-4 py-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-lg">queue</span>
+              <h3 class="text-sm font-bold text-slate-800">Waiting Queue</h3>
+            </div>
+            <span class="rounded bg-primary/10 px-2 py-1 text-xs font-bold text-primary" id="queue-count">0 people</span>
+          </div>
+        </div>
+        <div id="queue-list" class="divide-y divide-gray-100">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="rounded-lg border border-gray-200 bg-gray-50 p-3">
+        <div class="flex gap-2">
+          <span class="material-symbols-outlined text-primary text-base flex-shrink-0">info</span>
+          <div>
+            <p class="text-xs font-semibold text-slate-700">Real-time Updates</p>
+            <p class="text-[10px] text-slate-500">Keep this page open to receive live updates.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Share -->
+      <div class="rounded-lg border border-gray-200 bg-white p-3">
+        <p class="mb-2 text-xs font-semibold text-slate-700">Share this queue</p>
+        <div class="flex gap-2">
+          <input type="text" readonly value="<%= token_queue_url(@token_queue.unique_token) %>" id="queue-share-link" class="flex-1 rounded border border-gray-300 bg-gray-50 px-3 py-2 text-xs text-slate-600 focus:outline-none">
+          <button type="button" onclick="copyShareLink()" class="rounded bg-primary px-3 py-2 text-xs font-bold text-white hover:bg-primary/90 flex-shrink-0">Copy</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-gray-200 bg-white px-4 py-4 text-center">
+    <p class="text-[10px] text-slate-500">© <%= Time.current.year %> QuickToken</p>
+  </footer>
 </div>
+
+<script>
+  function copyShareLink() {
+    const link = document.getElementById("queue-share-link")
+    if (!link) return
+    link.select()
+    navigator.clipboard.writeText(link.value).then(() => {
+      showToast("Link copied!", "success")
+    })
+  }
+
+  function showToast(message, type = "info") {
+    const container = document.getElementById("toast-container")
+    if (!container) return
+    
+    const toast = document.createElement("div")
+    const colors = {
+      success: "border-emerald-200 bg-emerald-50 text-emerald-800",
+      error: "border-red-200 bg-red-50 text-red-700",
+      info: "border-blue-200 bg-blue-50 text-blue-800"
+    }
+    const icons = { success: "check_circle", error: "error", info: "info" }
+    
+    toast.className = `toast-notification flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium shadow-lg ${colors[type]}`
+    toast.innerHTML = `<span class="material-symbols-outlined text-base">${icons[type]}</span><span>${message}</span>`
+    
+    container.appendChild(toast)
+    setTimeout(() => {
+      toast.style.transition = "opacity 0.3s"
+      toast.style.opacity = "0"
+      setTimeout(() => toast.remove(), 300)
+    }, 4000)
+  }
+</script>
