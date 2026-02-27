@@ -3,9 +3,21 @@ class CustomersController < ApplicationController
   before_action :require_admin!, only: %i[next]
 
   def create
+    token = @token_queue.unique_token
+    existing_customer_id = queue_memberships[token]
+    existing_customer = @token_queue.customers.find_by(id: existing_customer_id) if existing_customer_id.present?
+
+    if existing_customer&.status.in?(%w[waiting serving])
+      redirect_to token_queue_path(token, customer_id: existing_customer.id), alert: "You have already joined this queue."
+      return
+    end
+
+    queue_memberships.delete(token)
+
     customer = @token_queue.customers.new(customer_params.merge(status: "waiting"))
 
     if customer.save
+      queue_memberships[token] = customer.id
       broadcast_queue_update
       redirect_to token_queue_path(@token_queue.unique_token, customer_id: customer.id), notice: "You joined the queue."
     else
@@ -26,6 +38,7 @@ class CustomersController < ApplicationController
       return
     end
 
+    queue_memberships.delete(@token_queue.unique_token) if queue_memberships[@token_queue.unique_token].to_s == customer.id.to_s
     customer.destroy
     broadcast_queue_update
 

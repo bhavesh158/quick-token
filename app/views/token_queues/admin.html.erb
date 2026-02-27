@@ -17,9 +17,17 @@
     <div class="flex items-center gap-3">
       <div class="hidden md:flex items-center rounded-lg border border-slate-200 bg-slate-100 px-3 py-1.5 gap-2 mr-4">
         <span class="material-symbols-outlined text-sm text-primary">link</span>
-        <span class="text-xs font-medium text-slate-600"><%= @public_queue_url %></span>
+        <span id="public-queue-link" class="text-xs font-medium text-slate-600"><%= @public_queue_url %></span>
+        <button
+          type="button"
+          class="text-xs font-bold text-primary hover:text-primary/80"
+          onclick="copyQueueLink()"
+        >
+          Copy
+        </button>
       </div>
       <a href="<%= admin_token_queue_report_path(@token_queue.unique_token) %>" class="rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700">Report</a>
+      <a href="<%= admin_token_queues_path %>" class="rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700">All Queues</a>
       <%= form_with(url: admin_logout_path, method: :delete) do |form| %>
         <%= form.submit "Logout", class: "rounded-lg bg-slate-900 px-3 py-2 text-xs font-bold text-white hover:bg-slate-700" %>
       <% end %>
@@ -68,6 +76,7 @@
               </div>
             <% end %>
           <% end %>
+
         </div>
       </div>
 
@@ -99,3 +108,13 @@
     </div>
   </footer>
 </div>
+
+<script>
+  function copyQueueLink() {
+    const link = document.getElementById("public-queue-link")?.textContent?.trim()
+    if (!link) return
+    navigator.clipboard.writeText(link).then(() => {
+      alert("Queue link copied to clipboard")
+    })
+  }
+</script>

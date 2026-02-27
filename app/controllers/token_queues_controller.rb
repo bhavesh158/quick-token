@@ -1,15 +1,27 @@
 require "csv"
 
 class TokenQueuesController < ApplicationController
-  before_action :require_admin!, only: %i[admin report]
+  before_action :require_admin!, only: %i[index admin report]
   before_action :set_token_queue_by_token, only: %i[show]
   before_action :set_token_queue_by_admin_token, only: %i[admin report]
 
   def new
+    if admin_logged_in?
+      redirect_to admin_token_queues_path
+      return
+    end
+
     @token_queue = TokenQueue.new
   end
 
+  def index
+    @token_queues = TokenQueue.order(created_at: :desc).includes(:customers)
+    @new_token_queue = TokenQueue.new
+  end
+
   def create
+    from_dashboard = params[:from_dashboard] == "1"
+
     unless admin_logged_in?
       session[:pending_queue_name] = params.dig(:token_queue, :name).to_s
       redirect_to admin_login_path, alert: "Admin login required to create a queue."
@@ -19,14 +31,33 @@ class TokenQueuesController < ApplicationController
     @token_queue = TokenQueue.new(token_queue_params)
 
     if @token_queue.save
-      redirect_to admin_token_queue_path(@token_queue.unique_token), notice: "Queue created."
+      if from_dashboard
+        redirect_to admin_token_queues_path, notice: "Queue created."
+      else
+        redirect_to admin_token_queue_path(@token_queue.unique_token), notice: "Queue created."
+      end
     else
-      render :new, status: :unprocessable_entity
+      if from_dashboard
+        @token_queues = TokenQueue.order(created_at: :desc).includes(:customers)
+        @new_token_queue = @token_queue
+        render :index, status: :unprocessable_entity
+      else
+        render :new, status: :unprocessable_entity
+      end
     end
   end
 
   def show
-    @current_customer = @token_queue.customers.find_by(id: params[:customer_id])
+    session_customer_id = queue_memberships[@token_queue.unique_token]
+    @current_customer = @token_queue.customers.find_by(id: session_customer_id || params[:customer_id])
+
+    if @current_customer&.status.in?(%w[waiting serving])
+      queue_memberships[@token_queue.unique_token] = @current_customer.id
+    else
+      queue_memberships.delete(@token_queue.unique_token)
+      @current_customer = nil
+    end
+
     @queue_status = @token_queue.queue_status
     @join_customer = Customer.new
   end

@@ -7,22 +7,20 @@
         </div>
         <h2 class="text-xl font-bold tracking-tight text-slate-900">QuickToken</h2>
       </div>
+      <nav class="hidden md:flex items-center gap-8">
+        <a class="text-sm font-medium text-slate-600 hover:text-primary" href="#how-it-works">How it works</a>
+        <a class="text-sm font-medium text-slate-600 hover:text-primary" href="#features">Features</a>
+        <a class="text-sm font-medium text-slate-600 hover:text-primary" href="#start">Start</a>
+      </nav>
       <div class="flex items-center gap-4">
-        <% if admin_logged_in? %>
-          <span class="hidden sm:inline rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">Admin session active</span>
-          <%= form_with(url: admin_logout_path, method: :delete) do |form| %>
-            <%= form.submit "Logout", class: "hidden sm:flex h-10 items-center justify-center rounded-lg bg-slate-900 px-4 text-sm font-bold text-white transition-all hover:bg-slate-700" %>
-          <% end %>
-        <% else %>
-          <a href="<%= admin_login_path %>" class="hidden sm:flex h-10 items-center justify-center rounded-lg border border-slate-300 px-4 text-sm font-bold text-slate-700 transition-all hover:bg-slate-100">Admin Login</a>
-        <% end %>
+        <a href="<%= admin_login_path %>" class="hidden sm:flex h-10 items-center justify-center rounded-lg border border-slate-300 px-4 text-sm font-bold text-slate-700 transition-all hover:bg-slate-100">Admin Login</a>
         <button class="hidden sm:flex h-10 items-center justify-center rounded-lg bg-primary px-5 text-sm font-bold text-white transition-all hover:bg-primary/90" form="new-queue-form">Create Queue</button>
       </div>
     </div>
   </header>
 
   <main class="flex-1">
-    <section class="mx-auto max-w-7xl px-6 py-16 lg:px-10 lg:py-24">
+    <section class="mx-auto max-w-7xl px-6 py-16 lg:px-10 lg:py-24" id="start">
       <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
         <div class="flex flex-col gap-8">
           <% if flash[:notice].present? %>
@@ -56,7 +54,7 @@
             <div class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"><%= @token_queue.errors.full_messages.to_sentence %></div>
           <% end %>
 
-          <div class="flex items-center gap-6">
+          <div class="flex items-center gap-6" id="features">
             <div class="flex -space-x-2">
               <div class="h-8 w-8 rounded-full border-2 border-background-light bg-slate-200"></div>
               <div class="h-8 w-8 rounded-full border-2 border-background-light bg-slate-300"></div>
@@ -106,5 +104,71 @@
         </div>
       </div>
     </section>
+
+    <section class="bg-slate-50 py-20" id="how-it-works">
+      <div class="mx-auto max-w-7xl px-6 lg:px-10">
+        <div class="mb-16 text-center">
+          <h2 class="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">How it works</h2>
+          <p class="mx-auto mt-4 max-w-2xl text-slate-600">
+            Getting started is as simple as 1-2-3. No complex setup or app downloads required for you or your customers.
+          </p>
+        </div>
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
+          <div class="group relative flex flex-col items-center text-center">
+            <div class="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-white text-primary shadow-sm transition-all group-hover:-translate-y-1 group-hover:shadow-md">
+              <span class="material-symbols-outlined text-4xl">edit_note</span>
+            </div>
+            <h3 class="mb-3 text-xl font-bold text-slate-900">1. Name it</h3>
+            <p class="text-slate-600 leading-relaxed">Give your queue a clear name so customers know they are in the right place.</p>
+          </div>
+          <div class="group relative flex flex-col items-center text-center">
+            <div class="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-white text-primary shadow-sm transition-all group-hover:-translate-y-1 group-hover:shadow-md">
+              <span class="material-symbols-outlined text-4xl">qr_code_2</span>
+            </div>
+            <h3 class="mb-3 text-xl font-bold text-slate-900">2. Share it</h3>
+            <p class="text-slate-600 leading-relaxed">Share your unique queue link so customers can join instantly from mobile.</p>
+          </div>
+          <div class="group flex flex-col items-center text-center">
+            <div class="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-white text-primary shadow-sm transition-all group-hover:-translate-y-1 group-hover:shadow-md">
+              <span class="material-symbols-outlined text-4xl">notifications_active</span>
+            </div>
+            <h3 class="mb-3 text-xl font-bold text-slate-900">3. Serve them</h3>
+            <p class="text-slate-600 leading-relaxed">Use the real-time dashboard and call the next person with one click.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mx-auto max-w-7xl px-6 py-20 lg:px-10 lg:py-32">
+      <div class="relative overflow-hidden rounded-3xl bg-primary px-8 py-16 text-center text-white shadow-2xl lg:px-16">
+        <div class="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
+        <div class="absolute -bottom-16 -left-16 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
+        <div class="relative z-10 flex flex-col items-center gap-6">
+          <h2 class="max-w-2xl text-3xl font-black sm:text-4xl md:text-5xl">Ready to clear the crowd?</h2>
+          <p class="max-w-lg text-lg opacity-90">Start your first digital queue today.</p>
+          <button class="mt-4 flex h-14 items-center justify-center rounded-xl bg-white px-10 text-lg font-bold text-primary transition-all hover:bg-slate-50">Get Started Now</button>
+        </div>
+      </div>
+    </section>
   </main>
+
+  <footer class="border-t border-slate-200 bg-white py-12">
+    <div class="mx-auto max-w-7xl px-6 lg:px-10">
+      <div class="flex flex-col items-center justify-between gap-8 md:flex-row">
+        <div class="flex items-center gap-2">
+          <div class="flex h-6 w-6 items-center justify-center rounded bg-primary text-white">
+            <span class="material-symbols-outlined text-sm">confirmation_number</span>
+          </div>
+          <span class="text-lg font-bold tracking-tight text-slate-900">QuickToken</span>
+        </div>
+        <div class="flex flex-wrap items-center justify-center gap-8 text-sm font-medium text-slate-500">
+          <a class="hover:text-primary" href="<%= privacy_path %>">Privacy Policy</a>
+          <a class="hover:text-primary" href="<%= terms_path %>">Terms of Service</a>
+          <a class="hover:text-primary" href="<%= help_path %>">Help Center</a>
+          <a class="hover:text-primary" href="<%= contact_path %>">Contact</a>
+        </div>
+        <div class="text-sm text-slate-400">© 2026 QuickToken. All rights reserved.</div>
+      </div>
+    </div>
+  </footer>
 </div>

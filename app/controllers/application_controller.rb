@@ -17,4 +17,8 @@ class ApplicationController < ActionController::Base
   def consume_return_to
     session.delete(:return_to)
   end
+
+  def queue_memberships
+    session[:queue_memberships] ||= {}
+  end
 end

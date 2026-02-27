@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   post "queues", to: "token_queues#create", as: :create_token_queues
   get "queues/:id", to: "token_queues#show", as: :token_queue
 
+  get "admin/queues", to: "token_queues#index", as: :admin_token_queues
   get "admin/:token", to: "token_queues#admin", as: :admin_token_queue
   get "admin/:token/report", to: "token_queues#report", as: :admin_token_queue_report
 

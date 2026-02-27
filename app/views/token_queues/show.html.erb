@@ -13,7 +13,14 @@
         </div>
         <h2 class="text-lg font-bold leading-tight tracking-tight text-slate-900"><%= @token_queue.name %></h2>
       </div>
-      <a href="<%= admin_token_queue_path(@token_queue.unique_token) %>" class="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700">Admin</a>
+      <div class="flex gap-3">
+        <button class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-700">
+          <span class="material-symbols-outlined text-[20px]">notifications</span>
+        </button>
+        <button class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-700">
+          <span class="material-symbols-outlined text-[20px]">account_circle</span>
+        </button>
+      </div>
     </header>
 
     <main class="flex flex-1 justify-center py-8 px-4 lg:px-40">

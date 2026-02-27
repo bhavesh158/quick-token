@@ -4,7 +4,7 @@ class AdminSessionsController < ApplicationController
   def new
     return unless admin_logged_in?
 
-    redirect_to new_token_queue_path, notice: "You are already logged in."
+    redirect_to admin_token_queues_path, notice: "You are already logged in."
   end
 
   def create
@@ -14,12 +14,12 @@ class AdminSessionsController < ApplicationController
       if pending_queue_name.present?
         queue = TokenQueue.create(name: pending_queue_name)
         if queue.persisted?
-          redirect_to admin_token_queue_path(queue.unique_token), notice: "Queue created."
+          redirect_to admin_token_queues_path, notice: "Queue created."
           return
         end
       end
 
-      redirect_to(consume_return_to || new_token_queue_path, notice: "Logged in as admin.")
+      redirect_to(consume_return_to || admin_token_queues_path, notice: "Logged in as admin.")
     else
       flash.now[:alert] = "Invalid admin password."
       render :new, status: :unprocessable_entity
