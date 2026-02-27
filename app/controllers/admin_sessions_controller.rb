@@ -1,0 +1,30 @@
+class AdminSessionsController < ApplicationController
+  ADMIN_PASSWORD_ENV_KEY = "QUICK_TOKEN_ADMIN_PASSWORD".freeze
+
+  def new
+    return unless admin_logged_in?
+
+    redirect_to new_token_queue_path, notice: "You are already logged in."
+  end
+
+  def create
+    if params[:password].to_s == admin_password
+      session[:admin_logged_in] = true
+      redirect_to new_token_queue_path, notice: "Logged in as admin."
+    else
+      flash.now[:alert] = "Invalid admin password."
+      render :new, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    session.delete(:admin_logged_in)
+    redirect_to admin_login_path, notice: "Logged out."
+  end
+
+  private
+
+  def admin_password
+    ENV.fetch(ADMIN_PASSWORD_ENV_KEY, "admin123")
+  end
+end
